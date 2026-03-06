@@ -1,4 +1,30 @@
+$header-bg-color: #1a1a2e;
+/* Deep navy base */
+$header-bg-color-secondary: #16213e;
+/* Secondary gradient color */
+
 @import "jekyll-theme-architect";
+
+/* Override Architect Theme Defaults for a Premium Look */
+header {
+    background: linear-gradient(135deg, $header-bg-color 0%, $header-bg-color-secondary 100%) !important;
+    color: #e2e8f0 !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+header h1 {
+    color: #ffffff !important;
+    font-family: 'Inter', sans-serif !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.025em;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+header h2 {
+    color: #94a3b8 !important;
+    font-family: 'Inter', sans-serif !important;
+    font-weight: 400 !important;
+}
 
 /* Custom Styling to Match Post Preview Design */
 
