@@ -1,17 +1,24 @@
 ---
 layout: default
-title: Home
+title: Mahesh Challa's Blog
 ---
 
-# Welcome to my blog!
+# Latest Insights
 
 Check out my latest posts:
 
-<ul>
+<div class="posts-list">
   {% for post in site.posts %}
-    <li>
-      <span>{{ post.date | date: "%B %e, %Y" }}</span> &raquo; 
-      <a href="{{ post.url }}">{{ post.title }}</a>
-    </li>
+    <article class="post-preview">
+      <div class="post-meta">
+        {{ post.date | date: "%b %e, %Y" }}
+      </div>
+      <h2>
+        <a href="{{ post.url }}">{{ post.title }}</a>
+      </h2>
+      <div class="post-excerpt">
+        {{ post.description }}
+      </div>
+    </article>
   {% endfor %}
-</ul>
+</div>

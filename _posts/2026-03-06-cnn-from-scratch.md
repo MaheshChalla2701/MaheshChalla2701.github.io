@@ -2,6 +2,7 @@
 layout: post
 title: "Building a CNN from Scratch"
 date: 2026-03-06
+description: "A deep dive into the architecture and mathematics of Convolutional Neural Networks, built from the ground up."
 ---
 
 Convolutional Neural Networks (CNNs) are a class of deep neural networks, most commonly applied to analyzing visual imagery. 
