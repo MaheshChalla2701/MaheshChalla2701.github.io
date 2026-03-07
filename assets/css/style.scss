@@ -73,3 +73,102 @@ body {
     line-height: 1.5;
     font-size: 1.15rem;
 }
+
+/* VS Code Style Code Blocks */
+.highlight {
+    background-color: #1e1e1e !important;
+    /* VS Code dark background */
+    color: #d4d4d4 !important;
+    /* Light grey text */
+    padding: 1rem !important;
+    border-radius: 8px !important;
+    overflow-x: auto !important;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace !important;
+    font-size: 0.9rem !important;
+    border: 1px solid #333 !important;
+}
+
+.highlight code {
+    background: none !important;
+    padding: 0 !important;
+    color: inherit !important;
+}
+
+/* Inline code fragments */
+p>code,
+li>code {
+    background-color: #f1f5f9;
+    color: #db2777;
+    /* Pinkish red for inline code */
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 0.9em;
+}
+
+/* Basic Syntax Highlighting Colors (assuming Rouge Rouge base) */
+.highlight .c,
+.highlight .c1,
+.highlight .cm {
+    color: #6a9955 !important;
+    font-style: italic;
+}
+
+/* Comments */
+.highlight .k,
+.highlight .kd,
+.highlight .kn,
+.highlight .kp,
+.highlight .kr,
+.highlight .kv {
+    color: #569cd6 !important;
+}
+
+/* Keywords */
+.highlight .n,
+.highlight .nx {
+    color: #9cdcfe !important;
+}
+
+/* Variables/Names */
+.highlight .s,
+.highlight .s1,
+.highlight .s2,
+.highlight .mb,
+.highlight .mf,
+.highlight .mh,
+.highlight .mi,
+.highlight .mo,
+.highlight .il {
+    color: #ce9178 !important;
+}
+
+/* Strings & Numbers */
+.highlight .o,
+.highlight .ow {
+    color: #d4d4d4 !important;
+}
+
+/* Operators */
+.highlight .p {
+    color: #d4d4d4 !important;
+}
+
+/* Punctuation */
+.highlight .nb,
+.highlight .bp {
+    color: #4ec9b0 !important;
+}
+
+/* Built-ins */
+.highlight .nc,
+.highlight .nf {
+    color: #dcdcaa !important;
+}
+
+/* Functions/Classes */
+
+/* Hide default GitHub pages footer generation msg */
+footer {
+    display: none !important;
+}

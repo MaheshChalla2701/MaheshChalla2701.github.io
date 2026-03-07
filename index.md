@@ -10,9 +10,7 @@ Check out my latest posts:
 <div class="posts-list">
   {% for post in site.posts %}
     <article class="post-preview">
-      <div class="post-meta">
-        {{ post.date | date: "%b %e, %Y" }}
-      </div>
+    <br>
       <h2>
         <a href="{{ post.url }}">{{ post.title }}</a>
       </h2>
