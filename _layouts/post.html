@@ -24,3 +24,25 @@ layout: default
         }
     };
 </script>
+
+<!-- Add Mermaid for diagrams -->
+<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script>
+    mermaid.initialize({
+        startOnLoad: true,
+        theme: 'default',
+        securityLevel: 'loose',
+    });
+
+    // Support Jekyll/Kramdown mermaid blocks
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('code.language-mermaid').forEach(function (block) {
+            const pre = block.parentElement;
+            const mermaidDiv = document.createElement('div');
+            mermaidDiv.className = 'mermaid';
+            mermaidDiv.textContent = block.textContent;
+            pre.replaceWith(mermaidDiv);
+        });
+        mermaid.init(undefined, '.mermaid');
+    });
+</script>

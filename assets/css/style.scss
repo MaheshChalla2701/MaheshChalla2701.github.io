@@ -1,4 +1,4 @@
-$header-bg-color: #1a1a2e;
+--- --- $header-bg-color: #1a1a2e;
 /* Deep navy base */
 $header-bg-color-secondary: #16213e;
 /* Secondary gradient color */
@@ -75,17 +75,30 @@ body {
 }
 
 /* VS Code Style Code Blocks */
+div.highlighter-rouge,
+figure.highlight,
+pre.highlight,
 .highlight {
     background-color: #1e1e1e !important;
     /* VS Code dark background */
     color: #d4d4d4 !important;
     /* Light grey text */
-    padding: 1rem !important;
-    border-radius: 8px !important;
+    padding: 1.25rem !important;
+    border-radius: 10px !important;
     overflow-x: auto !important;
+    margin: 1.5rem 0 !important;
     font-family: 'Consolas', 'Monaco', 'Courier New', monospace !important;
-    font-size: 0.9rem !important;
-    border: 1px solid #333 !important;
+    font-size: 0.95rem !important;
+    border: 1px solid #3c3c3c !important;
+    line-height: 1.5 !important;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.highlight pre {
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
 }
 
 .highlight code {
@@ -98,20 +111,28 @@ body {
 p>code,
 li>code {
     background-color: #f1f5f9;
-    color: #db2777;
-    /* Pinkish red for inline code */
+    color: #e11d48;
+    /* Vibrant red for inline code */
     padding: 0.2rem 0.4rem;
-    border-radius: 4px;
+    border-radius: 6px;
     font-family: 'Consolas', 'Monaco', monospace;
     font-size: 0.9em;
+    border: 1px solid #e2e8f0;
 }
 
-/* Basic Syntax Highlighting Colors (assuming Rouge Rouge base) */
+.post-content h3 {
+    color: #3273dc;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+/* Syntax Highlighting Colors (VS Code style) */
 .highlight .c,
 .highlight .c1,
 .highlight .cm {
     color: #6a9955 !important;
-    font-style: italic;
+    font-style: italic !important;
 }
 
 /* Comments */
@@ -122,28 +143,42 @@ li>code {
 .highlight .kr,
 .highlight .kv {
     color: #569cd6 !important;
+    font-weight: 500 !important;
 }
 
 /* Keywords */
-.highlight .n,
-.highlight .nx {
-    color: #9cdcfe !important;
-}
-
-/* Variables/Names */
 .highlight .s,
 .highlight .s1,
 .highlight .s2,
+.highlight .sb,
+.highlight .sc,
+.highlight .sd,
+.highlight .se,
+.highlight .sh,
+.highlight .si,
+.highlight .sx {
+    color: #ce9178 !important;
+}
+
+/* Strings */
+.highlight .m,
 .highlight .mb,
 .highlight .mf,
 .highlight .mh,
 .highlight .mi,
 .highlight .mo,
 .highlight .il {
-    color: #ce9178 !important;
+    color: #b5cea8 !important;
 }
 
-/* Strings & Numbers */
+/* Numbers */
+.highlight .n,
+.highlight .nx,
+.highlight .nv {
+    color: #9cdcfe !important;
+}
+
+/* Variables/Names */
 .highlight .o,
 .highlight .ow {
     color: #d4d4d4 !important;
@@ -162,11 +197,28 @@ li>code {
 
 /* Built-ins */
 .highlight .nc,
-.highlight .nf {
+.highlight .nf,
+.highlight .fm {
     color: #dcdcaa !important;
 }
 
 /* Functions/Classes */
+.highlight .nt {
+    color: #569cd6 !important;
+}
+
+/* HTML/XML tags */
+.highlight .na {
+    color: #9cdcfe !important;
+}
+
+/* HTML/XML attributes */
+.highlight .err {
+    color: #f44747 !important;
+    border-bottom: 1px solid #f44747 !important;
+}
+
+/* Errors */
 
 /* Hide default GitHub pages footer generation msg */
 footer {

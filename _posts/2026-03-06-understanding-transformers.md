@@ -65,6 +65,9 @@ graph TD
     H --> I[Output Word Prediction]
 ```
 
+![Transformer Architecture](/assets/images/transformer-architecture.png)
+*Figure 1: The Transformer - model architecture.*
+
 ---
 
 ### Tokenization in Transformers
@@ -89,6 +92,93 @@ Each token is then converted into numerical IDs from the model's vocabulary.
 
 ---
 
+#### 1️⃣ Tokenization (From Scratch)
+
+A simple tokenizer splits a sentence into words.
+
+```python
+def tokenize(sentence):
+    tokens = sentence.lower().split()
+    return tokens
+
+text = "Transformers are powerful models"
+
+tokens = tokenize(text)
+print(tokens)
+```
+
+**Output:**
+```python
+['transformers', 'are', 'powerful', 'models']
+```
+
+This simple tokenizer splits text into tokens using spaces. Real NLP models use more advanced tokenization techniques like subword tokenization.
+
+---
+
+#### 2️⃣ Convert Tokens to Token IDs
+
+Models cannot process words directly, so we convert them into numbers.
+
+```python
+vocab = {
+    "transformers": 1,
+    "are": 2,
+    "powerful": 3,
+    "models": 4
+}
+
+tokens = ["transformers", "are", "powerful", "models"]
+
+token_ids = [vocab[token] for token in tokens]
+
+print(token_ids)
+```
+
+**Output:**
+```python
+[1, 2, 3, 4]
+```
+
+---
+
+**Code Block 1 — Tokenization**
+
+Example using the Hugging Face Transformers tokenizer.
+
+```python
+from transformers import AutoTokenizer
+
+tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
+
+text = "Transformers are powerful models"
+
+tokens = tokenizer.tokenize(text)
+print(tokens)
+```
+
+**Output:**
+```python
+['transformers', 'are', 'powerful', 'models']
+```
+
+**Code Block 2 — Convert Tokens to IDs**
+
+```python
+token_ids = tokenizer.convert_tokens_to_ids(tokens)
+
+print(token_ids)
+```
+
+**Example output:**
+```python
+[19081, 2024, 3928, 4275]
+```
+
+This shows how words become numbers.
+
+---
+
 ### Input Embedding in Transformers
 
 **What is Input Embedding?**
@@ -106,6 +196,55 @@ Input Embedding is the process of converting token IDs into **dense numerical ve
 | **AI** | 910 | `[-0.22, 0.91, 0.34, ...]` |
 
 In real models, these vectors can have dimensions like **512, 768, 1024, or even 4096+**.
+
+---
+
+#### 3️⃣ Input Embedding (From Scratch)
+
+We convert token IDs into vectors.
+
+```python
+import numpy as np
+
+vocab_size = 10
+embedding_dim = 4
+
+embedding_matrix = np.random.rand(vocab_size, embedding_dim)
+
+token_ids = [1, 2, 3]
+
+embeddings = embedding_matrix[token_ids]
+
+print(embeddings)
+```
+
+This creates vector representations for tokens.
+
+---
+
+**Code Block 3 — Embedding Representation**
+
+Example using PyTorch.
+
+```python
+import torch
+import torch.nn as nn
+
+embedding = nn.Embedding(num_embeddings=10000, embedding_dim=512)
+
+token_ids = torch.tensor([15, 289, 910])
+
+vectors = embedding(token_ids)
+
+print(vectors.shape)
+```
+
+**Output:**
+```python
+torch.Size([3, 512])
+```
+
+This means 3 tokens → 512-dimension vectors.
 
 **Why Input Embedding is Important**
 Input embeddings allow the model to capture **semantic relationships** between words. A famous example is:
@@ -147,6 +286,66 @@ The original Transformer paper used **sinusoidal (wave-like) functions** to gene
 **The Simple Calculation:**
 > **Final Input Vector = Word Embedding Vector + Positional Encoding Vector**
 
+---
+
+#### 4️⃣ Positional Encoding (Simplified)
+
+Add position information to embeddings.
+
+```python
+import numpy as np
+
+def positional_encoding(length, d_model):
+    pos_encoding = np.zeros((length, d_model))
+
+    for pos in range(length):
+        for i in range(d_model):
+            pos_encoding[pos][i] = pos / (10000 ** (2*i/d_model))
+
+    return pos_encoding
+
+encoding = positional_encoding(5, 4)
+print(encoding)
+```
+
+This gives each word a unique position vector.
+
+---
+
+**Code Block: PyTorch Positional Encoding**
+
+Example using PyTorch.
+
+```python
+import torch
+import math
+
+def positional_encoding(seq_len, d_model):
+    pe = torch.zeros(seq_len, d_model)
+
+    for pos in range(seq_len):
+        for i in range(0, d_model, 2):
+            pe[pos, i] = math.sin(pos / (10000 ** ((2*i)/d_model)))
+            pe[pos, i+1] = math.cos(pos / (10000 ** ((2*(i+1))/d_model)))
+
+    return pe
+
+
+seq_len = 5
+d_model = 512
+
+pe = positional_encoding(seq_len, d_model)
+
+print(pe.shape)
+```
+
+**Output:**
+```python
+torch.Size([5, 512])
+```
+
+---
+
 *   **Example Process ("I love AI"):**
     *   **"I"** → Word Embedding `[0.2, 0.1, 0.7]` + Position 1 Vector `[0.01, 0.02, 0.03]`
     *   **"love"** → Word Embedding `[0.8, 0.4, 0.3]` + Position 2 Vector `[0.04, 0.05, 0.06]`
@@ -173,7 +372,7 @@ Every word is converted into three distinct vectors:
 *   **Value (V):** The actual information carried by the word ("I am word Y, here is my content").
 
 **A Simple Analogy:**
-> **"Queen attracts King at value of V"**
+> **"queen selects king to get more value"**
 > The Query (Queen) looks for a matching Key (King) to get the most relevant information (Value).
 
 **The process is simple:**
@@ -183,6 +382,68 @@ Every word is converted into three distinct vectors:
 
 > **Definition:** Self-Attention is a mechanism that allows each word in a sequence to analyze and weight its relationship with every other word, enabling the model to understand context and meaning efficiently.
 
+---
+
+#### 5️⃣ Self-Attention (Simple Scratch Code)
+
+This shows the core attention calculation. In real transformers, Q, K, and V are created by multiplying the input embeddings with learned weight matrices.
+
+```python
+import numpy as np
+
+# Input Embeddings (X)
+X = np.random.rand(3, 4)
+
+# Learned Weight Matrices
+WQ = np.random.rand(4, 4)
+WK = np.random.rand(4, 4)
+WV = np.random.rand(4, 4)
+
+# Projected Q, K, V
+Q = np.dot(X, WQ)
+K = np.dot(X, WK)
+V = np.dot(X, WV)
+
+# Similarity Score (Scaled Dot-Product)
+dk = K.shape[-1]
+scores = np.dot(Q, K.T) / np.sqrt(dk)
+
+weights = np.exp(scores) / np.sum(np.exp(scores), axis=1, keepdims=True)
+
+output = np.dot(weights, V)
+
+print(output)
+```
+
+This demonstrates:
+**Attention(Q,K,V) = softmax(QKᵀ / √dk)V**
+
+---
+
+**Code Block 4 — Simple Self-Attention Example**
+
+Example using PyTorch.
+
+```python
+import torch
+import math
+
+Q = torch.rand(3, 4)
+K = torch.rand(3, 4)
+V = torch.rand(3, 4)
+
+dk = K.size(-1)
+attention_scores = torch.matmul(Q, K.T) / math.sqrt(dk)
+
+attention_weights = torch.softmax(attention_scores, dim=-1)
+
+output = torch.matmul(attention_weights, V)
+
+print(output)
+```
+
+This demonstrates basic self-attention computation.
+
 ```mermaid
 graph TD
     Word --> Q[Query]
@@ -191,7 +452,6 @@ graph TD
     Q & K --> Score[Attention Score]
     Score & V --> Output[Context-Aware Output]
 ```
-
 #### A Visual Example: "The cat sat on the mat"
 When the model analyzes the sentence, it assigns scores based on relevance. For the word **"sat,"** the attention might look like this:
 
@@ -205,3 +465,94 @@ When the model analyzes the sentence, it assigns scores based on relevance. For 
 | **mat** | 0.10 |
 
 In this case, the word **"sat"** focuses most on **"cat"** (the subject) and **"sat"** itself, helping the model understand the action and who performed it.
+
+
+---
+
+### Multi-Head Attention: Learning Multiple Relationships
+
+**The technical steps are:**
+1.  **Similarity Score ($QK^T$):** This calculates how much each word relates to every other word in the sequence.
+2.  **Scaling ($\frac{1}{\sqrt{d_k}}$):** To stabilize training and prevent gradients from vanishing or exploding, the scores are divided by the square root of the dimension of the key vectors ($d_k$).
+3.  **Softmax:** Converts the scaled scores into probabilities (Attention Weights), ensuring they sum to 1.
+4.  **Weighted Sum:** Multiplies the weights by the **Value (V)** vectors to produce the final **context-aware representation** of each token.
+
+While Self-Attention allows a model to look at other words, it only learns **one** type of relationship at a time. However, language is complex and contains many types of relationships simultaneously:
+*   **Pronoun references** (Which word does "it" refer to?)
+*   **Sentence structure** (Subject-Verb relationship)
+*   **Long-distance dependencies** (Connecting words far apart)
+
+To solve this, Transformers use **Multi-Head Attention**—running multiple self-attention operations in parallel and then combining their outputs.
+
+#### A Linguistic Example:
+*"The animal didn't cross the street because it was tired."*
+
+Different attention "heads" may focus on different aspects:
+*   **Head 1:** Might focus on **pronoun references**, connecting "it" to "animal."
+*   **Head 2:** Might focus on the **sentence structure**, connecting "cross" to "street."
+*   **Head 3:** Might focus on the **reasoning**, connecting "tired" to "animal."
+
+By using multiple heads, the model understands richer linguistic patterns.
+
+#### The 4-Step Process of Multi-Head Attention
+
+**Step 0: Input Embeddings**
+Each token starts as an embedding vector.
+*   *Example:* 3 tokens → Embedding dimension 512.
+
+**Step 1: Create Q, K, V for Each Head**
+For each token embedding ($X$), the model creates Query, Key, and Value vectors using learnable weight matrices ($W^Q, W^K, W^V$). These weights are updated as the model trains.
+*   $Q = XW^Q$
+*   $K = XW^K$
+*   $V = XW^V$
+
+**Step 2: Compute Self-Attention for Each Head**
+Each head calculates its own attention scores independently using the standard formula:
+> **$Attention(Q,K,V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V$**
+
+**Step 3: Concatenate All Heads**
+The outputs from all attention heads are concatenated (joined together) to combine the different information they gathered.
+*   $Concat(Head_1, Head_2, ...)$
+
+**Step 4: Final Linear Layer**
+The concatenated result passes through a final linear projection ($W^O$) to produce the final output that the rest of the Transformer can use.
+> **$MultiHead(Q,K,V) = Concat(Head_1, ..., Head_H)W^O$**
+
+```mermaid
+graph TD
+    A[Input Embeddings X] --> B[Linear Projections]
+    B --> C1[Q = XW_Q]
+    B --> C2[K = XW_K]
+    B --> C3[V = XW_V]
+    C1 & C2 & C3 --> D[Self-Attention]
+    D --> E["softmax(QKᵀ / √d_k)V"]
+    E --> F[Multiple Heads]
+    F --> G[Concatenate Heads]
+    G --> H[Final Linear Layer]
+    H --> I[Multi-Head Attention Output]
+```
+
+In multi-head attention, the input embeddings are projected into queries, keys, and values using learned weight matrices, and multiple self-attention operations are computed in parallel to capture different relationships between tokens.
+
+---
+
+### Transformers in Action
+
+**Code Block 5 — Loading a Transformer Model**
+
+Example using BERT.
+
+```python
+from transformers import pipeline
+
+classifier = pipeline("sentiment-analysis")
+
+result = classifier("Transformers are amazing for NLP!")
+
+print(result)
+```
+
+**Output:**
+```python
+[{'label': 'POSITIVE', 'score': 0.99}]
+```
