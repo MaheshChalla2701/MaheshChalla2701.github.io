@@ -71,6 +71,7 @@ graph TD
 ---
 
 ### Tokenization in Transformers
+{: .technical-heading }
 
 **What is Tokenization?**
 Tokenization is the process of breaking raw text into smaller units called **tokens** so that a machine learning model can process them. Computers cannot directly understand words or sentences—they work with numbers. Therefore, text must first be split and converted into tokens.
@@ -180,6 +181,7 @@ This shows how words become numbers.
 ---
 
 ### Input Embedding in Transformers
+{: .technical-heading }
 
 **What is Input Embedding?**
 Input Embedding is the process of converting token IDs into **dense numerical vectors** so that the Transformer model can understand the meaning of words. After tokenization, words become numbers (token IDs), but neural networks work much better with vectors that capture semantic relationships.
@@ -264,6 +266,7 @@ This gives the model both the **meaning** of the word and its **position** in th
 ---
 
 ### Positional Encoding in Transformers
+{: .technical-heading }
 
 **What is Positional Encoding?**
 Positional Encoding is a technique used in Transformers to add information about the **position** of each word in a sentence. Because Transformers process all words at the same time (in parallel), the model does not naturally know the order of words. 
@@ -356,6 +359,7 @@ This allows the model to know both the **meaning** (from the embedding) and the 
 ---
 
 ### Deep Dive: How Self-Attention Works
+{: .technical-heading }
 
 Self-Attention is the mechanism that allows a model to analyze the relationship between words in a sequence. Think of it as a way for each word to ask: *"How much attention should I give to every other word to understand my own context?"*
 
@@ -470,6 +474,7 @@ In this case, the word **"sat"** focuses most on **"cat"** (the subject) and **"
 ---
 
 ### Multi-Head Attention: Learning Multiple Relationships
+{: .technical-heading }
 
 **The technical steps are:**
 1.  **Similarity Score ($QK^T$):** This calculates how much each word relates to every other word in the sequence.
