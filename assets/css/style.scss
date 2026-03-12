@@ -1,11 +1,13 @@
---- --- $header-bg-color: #1a1a2e;
-/* Deep navy base */
+---
+---
+$header-bg-color: #1a1a2e;
 $header-bg-color-secondary: #16213e;
-/* Secondary gradient color */
 
 @import "jekyll-theme-architect";
 
-/* Override Architect Theme Defaults for a Premium Look */
+/* =============================================
+   Header Styles
+   ============================================= */
 header {
     background: linear-gradient(135deg, $header-bg-color 0%, $header-bg-color-secondary 100%) !important;
     color: #e2e8f0 !important;
@@ -26,12 +28,16 @@ header h2 {
     font-weight: 400 !important;
 }
 
-/* Custom Styling to Match Post Preview Design */
-
+/* =============================================
+   Body & Font
+   ============================================= */
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
+/* =============================================
+   Post List / Preview
+   ============================================= */
 .posts-list {
     margin-top: 2rem;
 }
@@ -54,13 +60,11 @@ body {
 .post-preview h2 {
     margin: 0 0 0.4rem 0;
     font-size: 1.55rem;
-    /* Matches the larger feel in image */
     font-weight: 500;
 }
 
 .post-preview h2 a {
     color: #3273dc;
-    /* Professional blue from image */
     text-decoration: none;
 }
 
@@ -74,17 +78,15 @@ body {
     font-size: 1.15rem;
 }
 
-/* VS Code Style Code Blocks */
+/* =============================================
+   VS Code Dark Code Blocks
+   ============================================= */
 div.highlighter-rouge,
 figure.highlight,
 pre.highlight,
-.highlight,
-.highlight pre,
-.highlight code {
+.highlight {
     background-color: #1e1e1e !important;
-    /* VS Code dark background */
     color: #d4d4d4 !important;
-    /* Light grey text */
     padding: 1.25rem !important;
     border-radius: 10px !important;
     overflow-x: auto !important;
@@ -96,20 +98,27 @@ pre.highlight,
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
-.highlight pre,
-.highlight code {
+.highlight pre {
+    background: transparent !important;
     padding: 0 !important;
     margin: 0 !important;
     border: none !important;
-    background: transparent !important;
+    box-shadow: none !important;
 }
 
-/* Inline code fragments */
+.highlight code {
+    background: none !important;
+    padding: 0 !important;
+    border: none !important;
+    color: inherit !important;
+    box-shadow: none !important;
+}
+
+/* Inline code */
 p>code,
 li>code {
     background-color: #f1f5f9;
     color: #e11d48;
-    /* Vibrant red for inline code */
     padding: 0.2rem 0.4rem;
     border-radius: 6px;
     font-family: 'Consolas', 'Monaco', monospace;
@@ -117,48 +126,10 @@ li>code {
     border: 1px solid #e2e8f0;
 }
 
-/* Mermaid Diagram Sizing - Compact and Professional */
-.mermaid {
-    max-width: 100% !important;
-    margin: 1.5rem 0 !important;
-    display: flex;
-    justify-content: center;
-    background-color: transparent !important;
-    overflow: hidden !important;
-}
-
-.mermaid svg {
-    max-width: 450px !important;
-    /* Smaller width */
-    height: auto !important;
-    background-color: transparent !important;
-    transform: scale(0.85);
-    /* Tighter look */
-    transform-origin: center;
-}
-
-
-.post-content h1,
-.post-content h2,
-.post-content h3,
-.post-content h4 {
-    color: #111;
-    /* Default dark color */
-    margin-top: 2rem;
-    margin-bottom: 1rem;
-    font-weight: 600;
-}
-
-/* Specific class for the main technical sections requested by user */
-.technical-heading {
-    color: #3273dc !important;
-    font-size: 1.8rem !important;
-    border-bottom: 1px solid #e2e8f0;
-    padding-bottom: 0.5rem;
-    margin-top: 3rem !important;
-}
-
-/* Syntax Highlighting Colors (VS Code style) */
+/* =============================================
+   Syntax Highlighting (VS Code style)
+   ============================================= */
+/* Comments */
 .highlight .c,
 .highlight .c1,
 .highlight .cm {
@@ -166,7 +137,7 @@ li>code {
     font-style: italic !important;
 }
 
-/* Comments */
+/* Keywords */
 .highlight .k,
 .highlight .kd,
 .highlight .kn,
@@ -177,7 +148,7 @@ li>code {
     font-weight: 500 !important;
 }
 
-/* Keywords */
+/* Strings */
 .highlight .s,
 .highlight .s1,
 .highlight .s2,
@@ -191,7 +162,7 @@ li>code {
     color: #ce9178 !important;
 }
 
-/* Strings */
+/* Numbers */
 .highlight .m,
 .highlight .mb,
 .highlight .mf,
@@ -202,56 +173,102 @@ li>code {
     color: #b5cea8 !important;
 }
 
-/* Numbers */
+/* Variables/Names */
 .highlight .n,
 .highlight .nx,
 .highlight .nv {
     color: #9cdcfe !important;
 }
 
-/* Variables/Names */
+/* Operators */
 .highlight .o,
 .highlight .ow {
     color: #d4d4d4 !important;
 }
 
-/* Operators */
+/* Punctuation */
 .highlight .p {
     color: #d4d4d4 !important;
 }
 
-/* Punctuation */
+/* Built-ins */
 .highlight .nb,
 .highlight .bp {
     color: #4ec9b0 !important;
 }
 
-/* Built-ins */
+/* Functions/Classes */
 .highlight .nc,
 .highlight .nf,
 .highlight .fm {
     color: #dcdcaa !important;
 }
 
-/* Functions/Classes */
+/* HTML/XML tags */
 .highlight .nt {
     color: #569cd6 !important;
 }
 
-/* HTML/XML tags */
+/* HTML/XML attributes */
 .highlight .na {
     color: #9cdcfe !important;
 }
 
-/* HTML/XML attributes */
+/* Errors */
 .highlight .err {
     color: #f44747 !important;
     border-bottom: 1px solid #f44747 !important;
 }
 
-/* Errors */
+/* =============================================
+   Mermaid Diagrams — Small & Compact
+   ============================================= */
+.mermaid {
+    margin: 1.5rem auto !important;
+    display: flex !important;
+    justify-content: center !important;
+    background-color: transparent !important;
+    overflow-x: auto;
+    width: 100%;
+}
 
-/* Hide default GitHub pages footer generation msg */
+.mermaid svg {
+    max-width: 480px !important;
+    max-height: 400px !important;
+    height: auto !important;
+    background-color: transparent !important;
+    display: inline-block;
+}
+
+/* =============================================
+   Post Content General Headings
+   ============================================= */
+.post-content h1,
+.post-content h2,
+.post-content h3,
+.post-content h4 {
+    color: #1a1a2e;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+/* =============================================
+   Technical Section Headings (specific blue ones)
+   ============================================= */
+.technical-heading {
+    color: #3273dc !important;
+    font-size: 1.6rem !important;
+    font-weight: 700 !important;
+    border-bottom: 2px solid #3273dc !important;
+    padding-bottom: 0.5rem !important;
+    margin-top: 3rem !important;
+    margin-bottom: 1.25rem !important;
+}
+
+/* =============================================
+   Footer
+   ============================================= */
 footer {
     display: none !important;
 }

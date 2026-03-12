@@ -93,93 +93,6 @@ Each token is then converted into numerical IDs from the model's vocabulary.
 
 ---
 
-#### 1️⃣ Tokenization (From Scratch)
-
-A simple tokenizer splits a sentence into words.
-
-```python
-def tokenize(sentence):
-    tokens = sentence.lower().split()
-    return tokens
-
-text = "Transformers are powerful models"
-
-tokens = tokenize(text)
-print(tokens)
-```
-
-**Output:**
-```python
-['transformers', 'are', 'powerful', 'models']
-```
-
-This simple tokenizer splits text into tokens using spaces. Real NLP models use more advanced tokenization techniques like subword tokenization.
-
----
-
-#### 2️⃣ Convert Tokens to Token IDs
-
-Models cannot process words directly, so we convert them into numbers.
-
-```python
-vocab = {
-    "transformers": 1,
-    "are": 2,
-    "powerful": 3,
-    "models": 4
-}
-
-tokens = ["transformers", "are", "powerful", "models"]
-
-token_ids = [vocab[token] for token in tokens]
-
-print(token_ids)
-```
-
-**Output:**
-```python
-[1, 2, 3, 4]
-```
-
----
-
-**Code Block 1 — Tokenization**
-
-Example using the Hugging Face Transformers tokenizer.
-
-```python
-from transformers import AutoTokenizer
-
-tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
-
-text = "Transformers are powerful models"
-
-tokens = tokenizer.tokenize(text)
-print(tokens)
-```
-
-**Output:**
-```python
-['transformers', 'are', 'powerful', 'models']
-```
-
-**Code Block 2 — Convert Tokens to IDs**
-
-```python
-token_ids = tokenizer.convert_tokens_to_ids(tokens)
-
-print(token_ids)
-```
-
-**Example output:**
-```python
-[19081, 2024, 3928, 4275]
-```
-
-This shows how words become numbers.
-
----
-
 ### Input Embedding in Transformers
 {: .technical-heading }
 
@@ -198,55 +111,6 @@ Input Embedding is the process of converting token IDs into **dense numerical ve
 | **AI** | 910 | `[-0.22, 0.91, 0.34, ...]` |
 
 In real models, these vectors can have dimensions like **512, 768, 1024, or even 4096+**.
-
----
-
-#### 3️⃣ Input Embedding (From Scratch)
-
-We convert token IDs into vectors.
-
-```python
-import numpy as np
-
-vocab_size = 10
-embedding_dim = 4
-
-embedding_matrix = np.random.rand(vocab_size, embedding_dim)
-
-token_ids = [1, 2, 3]
-
-embeddings = embedding_matrix[token_ids]
-
-print(embeddings)
-```
-
-This creates vector representations for tokens.
-
----
-
-**Code Block 3 — Embedding Representation**
-
-Example using PyTorch.
-
-```python
-import torch
-import torch.nn as nn
-
-embedding = nn.Embedding(num_embeddings=10000, embedding_dim=512)
-
-token_ids = torch.tensor([15, 289, 910])
-
-vectors = embedding(token_ids)
-
-print(vectors.shape)
-```
-
-**Output:**
-```python
-torch.Size([3, 512])
-```
-
-This means 3 tokens → 512-dimension vectors.
 
 **Why Input Embedding is Important**
 Input embeddings allow the model to capture **semantic relationships** between words. A famous example is:
@@ -291,64 +155,6 @@ The original Transformer paper used **sinusoidal (wave-like) functions** to gene
 
 ---
 
-#### 4️⃣ Positional Encoding (Simplified)
-
-Add position information to embeddings.
-
-```python
-import numpy as np
-
-def positional_encoding(length, d_model):
-    pos_encoding = np.zeros((length, d_model))
-
-    for pos in range(length):
-        for i in range(d_model):
-            pos_encoding[pos][i] = pos / (10000 ** (2*i/d_model))
-
-    return pos_encoding
-
-encoding = positional_encoding(5, 4)
-print(encoding)
-```
-
-This gives each word a unique position vector.
-
----
-
-**Code Block: PyTorch Positional Encoding**
-
-Example using PyTorch.
-
-```python
-import torch
-import math
-
-def positional_encoding(seq_len, d_model):
-    pe = torch.zeros(seq_len, d_model)
-
-    for pos in range(seq_len):
-        for i in range(0, d_model, 2):
-            pe[pos, i] = math.sin(pos / (10000 ** ((2*i)/d_model)))
-            pe[pos, i+1] = math.cos(pos / (10000 ** ((2*(i+1))/d_model)))
-
-    return pe
-
-
-seq_len = 5
-d_model = 512
-
-pe = positional_encoding(seq_len, d_model)
-
-print(pe.shape)
-```
-
-**Output:**
-```python
-torch.Size([5, 512])
-```
-
----
-
 *   **Example Process ("I love AI"):**
     *   **"I"** → Word Embedding `[0.2, 0.1, 0.7]` + Position 1 Vector `[0.01, 0.02, 0.03]`
     *   **"love"** → Word Embedding `[0.8, 0.4, 0.3]` + Position 2 Vector `[0.04, 0.05, 0.06]`
@@ -388,66 +194,6 @@ Every word is converted into three distinct vectors:
 
 ---
 
-#### 5️⃣ Self-Attention (Simple Scratch Code)
-
-This shows the core attention calculation. In real transformers, Q, K, and V are created by multiplying the input embeddings with learned weight matrices.
-
-```python
-import numpy as np
-
-# Input Embeddings (X)
-X = np.random.rand(3, 4)
-
-# Learned Weight Matrices
-WQ = np.random.rand(4, 4)
-WK = np.random.rand(4, 4)
-WV = np.random.rand(4, 4)
-
-# Projected Q, K, V
-Q = np.dot(X, WQ)
-K = np.dot(X, WK)
-V = np.dot(X, WV)
-
-# Similarity Score (Scaled Dot-Product)
-dk = K.shape[-1]
-scores = np.dot(Q, K.T) / np.sqrt(dk)
-
-weights = np.exp(scores) / np.sum(np.exp(scores), axis=1, keepdims=True)
-
-output = np.dot(weights, V)
-
-print(output)
-```
-
-This demonstrates:
-**Attention(Q,K,V) = softmax(QKᵀ / √dk)V**
-
----
-
-**Code Block 4 — Simple Self-Attention Example**
-
-Example using PyTorch.
-
-```python
-import torch
-import math
-
-Q = torch.rand(3, 4)
-K = torch.rand(3, 4)
-V = torch.rand(3, 4)
-
-dk = K.size(-1)
-attention_scores = torch.matmul(Q, K.T) / math.sqrt(dk)
-
-attention_weights = torch.softmax(attention_scores, dim=-1)
-
-output = torch.matmul(attention_weights, V)
-
-print(output)
-```
-
-This demonstrates basic self-attention computation.
-
 ```mermaid
 graph TD
     Word --> Q[Query]
@@ -469,7 +215,6 @@ When the model analyzes the sentence, it assigns scores based on relevance. For 
 | **mat** | 0.10 |
 
 In this case, the word **"sat"** focuses most on **"cat"** (the subject) and **"sat"** itself, helping the model understand the action and who performed it.
-
 
 ---
 
@@ -543,21 +288,218 @@ In multi-head attention, the input embeddings are projected into queries, keys, 
 
 ### Transformers in Action
 
-**Code Block 5 — Loading a Transformer Model**
-
-Example using BERT.
+Below is the complete PyTorch implementation of the Transformer architecture, covering everything from positional encoding to the final model.
 
 ```python
-from transformers import pipeline
+import math
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
 
-classifier = pipeline("sentiment-analysis")
+# ==============================================================================
+# 1. Positional Encoding
+# ==============================================================================
+class PositionalEncoding(nn.Module):
+    """
+    Adds positional information to token embeddings.
+    """
+    def __init__(self, d_model, max_len=5000):
+        super().__init__()
+        pe = torch.zeros(max_len, d_model)
+        position = torch.arange(0, max_len, dtype=torch.float).unsqueeze(1)
+        div_term = torch.exp(torch.arange(0, d_model, 2).float() * (-math.log(10000.0) / d_model))
+        
+        pe[:, 0::2] = torch.sin(position * div_term)
+        pe[:, 1::2] = torch.cos(position * div_term)
+        
+        pe = pe.unsqueeze(0)
+        self.register_buffer('pe', pe)
 
-result = classifier("Transformers are amazing for NLP!")
+    def forward(self, x):
+        seq_len = x.size(1)
+        x = x + self.pe[:, :seq_len, :]
+        return x
 
-print(result)
-```
+# ==============================================================================
+# 2. Scaled Dot-Product Attention
+# ==============================================================================
+class ScaledDotProductAttention(nn.Module):
+    def __init__(self):
+        super().__init__()
 
-**Output:**
-```python
-[{'label': 'POSITIVE', 'score': 0.99}]
+    def forward(self, Q, K, V, mask=None):
+        d_k = Q.size(-1)
+        scores = torch.matmul(Q, K.transpose(-2, -1)) / math.sqrt(d_k)
+        
+        if mask is not None:
+            scores = scores.masked_fill(mask == 0, float('-inf'))
+        
+        attn = torch.softmax(scores, dim=-1)
+        output = torch.matmul(attn, V)
+        return output, attn
+
+# ==============================================================================
+# 3. Multi-Head Attention
+# ==============================================================================
+class MultiHeadAttention(nn.Module):
+    def __init__(self, d_model, num_heads):
+        super().__init__()
+        assert d_model % num_heads == 0
+        
+        self.d_model = d_model
+        self.num_heads = num_heads
+        self.d_k = d_model // num_heads
+        
+        self.w_q = nn.Linear(d_model, d_model)
+        self.w_k = nn.Linear(d_model, d_model)
+        self.w_v = nn.Linear(d_model, d_model)
+        self.w_o = nn.Linear(d_model, d_model)
+        
+        self.attention = ScaledDotProductAttention()
+
+    def split_heads(self, x):
+        batch_size, seq_len, d_model = x.size()
+        x = x.view(batch_size, seq_len, self.num_heads, self.d_k)
+        return x.transpose(1, 2)
+
+    def combine_heads(self, x):
+        batch_size, num_heads, seq_len, d_k = x.size()
+        x = x.transpose(1, 2).contiguous()
+        return x.view(batch_size, seq_len, num_heads * d_k)
+
+    def forward(self, query, key, value, mask=None):
+        Q = self.split_heads(self.w_q(query))
+        K = self.split_heads(self.w_k(key))
+        V = self.split_heads(self.w_v(value))
+        
+        attn_output, attn_weights = self.attention(Q, K, V, mask)
+        combined = self.combine_heads(attn_output)
+        output = self.w_o(combined)
+        return output, attn_weights
+
+# ==============================================================================
+# 4. Position-wise Feed Forward Network
+# ==============================================================================
+class FeedForward(nn.Module):
+    def __init__(self, d_model, d_ff, dropout=0.1):
+        super().__init__()
+        self.linear1 = nn.Linear(d_model, d_ff)
+        self.dropout = nn.Dropout(dropout)
+        self.linear2 = nn.Linear(d_ff, d_model)
+
+    def forward(self, x):
+        return self.linear2(self.dropout(F.relu(self.linear1(x))))
+
+# ==============================================================================
+# 5. Encoder Layer
+# ==============================================================================
+class EncoderLayer(nn.Module):
+    def __init__(self, d_model, num_heads, d_ff, dropout=0.1):
+        super().__init__()
+        self.self_attn = MultiHeadAttention(d_model, num_heads)
+        self.ffn = FeedForward(d_model, d_ff, dropout)
+        self.norm1 = nn.LayerNorm(d_model)
+        self.norm2 = nn.LayerNorm(d_model)
+        self.dropout = nn.Dropout(dropout)
+
+    def forward(self, x, src_mask=None):
+        attn_output, _ = self.self_attn(x, x, x, src_mask)
+        x = self.norm1(x + self.dropout(attn_output))
+        ffn_output = self.ffn(x)
+        x = self.norm2(x + self.dropout(ffn_output))
+        return x
+
+# ==============================================================================
+# 6. Decoder Layer
+# ==============================================================================
+class DecoderLayer(nn.Module):
+    def __init__(self, d_model, num_heads, d_ff, dropout=0.1):
+        super().__init__()
+        self.self_attn = MultiHeadAttention(d_model, num_heads)
+        self.cross_attn = MultiHeadAttention(d_model, num_heads)
+        self.ffn = FeedForward(d_model, d_ff, dropout)
+        self.norm1 = nn.LayerNorm(d_model)
+        self.norm2 = nn.LayerNorm(d_model)
+        self.norm3 = nn.LayerNorm(d_model)
+        self.dropout = nn.Dropout(dropout)
+
+    def forward(self, x, enc_output, tgt_mask=None, src_mask=None):
+        self_attn_output, _ = self.self_attn(x, x, x, tgt_mask)
+        x = self.norm1(x + self.dropout(self_attn_output))
+        cross_attn_output, _ = self.cross_attn(x, enc_output, enc_output, src_mask)
+        x = self.norm2(x + self.dropout(cross_attn_output))
+        ffn_output = self.ffn(x)
+        x = self.norm3(x + self.dropout(ffn_output))
+        return x
+
+# ==============================================================================
+# 7. Encoder
+# ==============================================================================
+class Encoder(nn.Module):
+    def __init__(self, vocab_size, d_model, num_layers, num_heads, d_ff, dropout=0.1, max_len=5000):
+        super().__init__()
+        self.embedding = nn.Embedding(vocab_size, d_model)
+        self.pos_encoding = PositionalEncoding(d_model, max_len)
+        self.layers = nn.ModuleList([EncoderLayer(d_model, num_heads, d_ff, dropout) for _ in range(num_layers)])
+        self.dropout = nn.Dropout(dropout)
+        self.d_model = d_model
+
+    def forward(self, src, src_mask=None):
+        x = self.embedding(src) * math.sqrt(self.d_model)
+        x = self.pos_encoding(x)
+        x = self.dropout(x)
+        for layer in self.layers:
+            x = layer(x, src_mask)
+        return x
+
+# ==============================================================================
+# 8. Decoder
+# ==============================================================================
+class Decoder(nn.Module):
+    def __init__(self, vocab_size, d_model, num_layers, num_heads, d_ff, dropout=0.1, max_len=5000):
+        super().__init__()
+        self.embedding = nn.Embedding(vocab_size, d_model)
+        self.pos_encoding = PositionalEncoding(d_model, max_len)
+        self.layers = nn.ModuleList([DecoderLayer(d_model, num_heads, d_ff, dropout) for _ in range(num_layers)])
+        self.dropout = nn.Dropout(dropout)
+        self.d_model = d_model
+
+    def forward(self, tgt, enc_output, tgt_mask=None, src_mask=None):
+        x = self.embedding(tgt) * math.sqrt(self.d_model)
+        x = self.pos_encoding(x)
+        x = self.dropout(x)
+        for layer in self.layers:
+            x = layer(x, enc_output, tgt_mask, src_mask)
+        return x
+
+# ==============================================================================
+# 9. Full Transformer
+# ==============================================================================
+class Transformer(nn.Module):
+    def __init__(self, src_vocab_size, tgt_vocab_size, d_model=512, num_layers=6, num_heads=8, d_ff=2048, dropout=0.1, max_len=5000, pad_idx=0):
+        super().__init__()
+        self.encoder = Encoder(src_vocab_size, d_model, num_layers, num_heads, d_ff, dropout, max_len)
+        self.decoder = Decoder(tgt_vocab_size, d_model, num_layers, num_heads, d_ff, dropout, max_len)
+        self.fc_out = nn.Linear(d_model, tgt_vocab_size)
+        self.pad_idx = pad_idx
+
+    def make_src_mask(self, src):
+        src_mask = (src != self.pad_idx).unsqueeze(1).unsqueeze(2)
+        return src_mask
+
+    def make_tgt_mask(self, tgt):
+        batch_size, tgt_len = tgt.shape
+        tgt_padding_mask = (tgt != self.pad_idx).unsqueeze(1).unsqueeze(2)
+        look_ahead_mask = torch.tril(torch.ones((tgt_len, tgt_len), device=tgt.device)).bool()
+        look_ahead_mask = look_ahead_mask.unsqueeze(0).unsqueeze(1)
+        tgt_mask = tgt_padding_mask & look_ahead_mask
+        return tgt_mask
+
+    def forward(self, src, tgt):
+        src_mask = self.make_src_mask(src)
+        tgt_mask = self.make_tgt_mask(tgt)
+        enc_output = self.encoder(src, src_mask)
+        dec_output = self.decoder(tgt, enc_output, tgt_mask, src_mask)
+        logits = self.fc_out(dec_output)
+        return logits
 ```
