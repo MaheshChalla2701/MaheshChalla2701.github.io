@@ -150,6 +150,17 @@ Both sentences contain the same words, but the meaning is completely different. 
 **How it Works: The Sinusoidal Approach**
 The original Transformer paper used **sinusoidal (wave-like) functions** to generate unique position values. This allows the model to learn relative distances between words and handle sequences longer than those seen during training.
 
+**The Formulas:**
+- For even dimensions ($2i$): 
+  $$PE_{(pos, 2i)} = \sin\left(\frac{pos}{10000^{2i/d_{model}}}\right)$$
+- For odd dimensions ($2i+1$): 
+  $$PE_{(pos, 2i+1)} = \cos\left(\frac{pos}{10000^{2i/d_{model}}}\right)$$
+
+*Where:*
+- **pos:** The position of the token in the sequence.
+- **i:** The dimension index.
+- **d_model:** The total number of dimensions in the embedding (e.g., 512).
+
 **The Simple Calculation:**
 > **Final Input Vector = Word Embedding Vector + Positional Encoding Vector**
 
@@ -181,6 +192,13 @@ Every word is converted into three distinct vectors:
 *   **Key (K):** What the word represents to others ("I am word Y, here is my label").
 *   **Value (V):** The actual information carried by the word ("I am word Y, here is my content").
 
+**The Mathematical Formula:**
+The relationship is computed using the **Scaled Dot-Product Attention** formula:
+$$Attention(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V$$
+
+*Where:*
+- **$d_k$:** The dimension of the key vectors ($K$). Dividing by $\sqrt{d_k}$ (scaling) prevents the scores from growing too large, which helps keep training stable.
+
 **A Simple Analogy:**
 > **"queen selects king to get more value"**
 > The Query (Queen) looks for a matching Key (King) to get the most relevant information (Value).
@@ -189,6 +207,8 @@ Every word is converted into three distinct vectors:
 1.  **Query × Key** → **Attention Score** (The model compares these to see how words relate).
 2.  Then, it uses the **Score** to **combine the Value vectors**.
 3.  This produces the **context-aware representation** of the word.
+    *   *Note:* The Softmax operation converts the attention scores into probabilities, and the final output is a weighted sum of the values. This creates a context-aware representation of each token.
+
 
 > **Definition:** Self-Attention is a mechanism that allows each word in a sequence to analyze and weight its relationship with every other word, enabling the model to understand context and meaning efficiently.
 
@@ -233,6 +253,10 @@ While Self-Attention allows a model to look at other words, it only learns **one
 *   **Long-distance dependencies** (Connecting words far apart)
 
 To solve this, Transformers use **Multi-Head Attention**—running multiple self-attention operations in parallel and then combining their outputs.
+
+**Why Multiple Heads?**
+A single self-attention layer computes only one attention pattern. However, language has many types of relationships simultaneously. Transformers use multiple attention heads to capture these diverse linguistic patterns.
+
 
 #### A Linguistic Example:
 *"The animal didn't cross the street because it was tired."*
@@ -286,6 +310,25 @@ In multi-head attention, the input embeddings are projected into queries, keys, 
 
 ---
 
+### The Feed-Forward Network (FFN)
+{: .technical-heading }
+
+After the multi-head attention layer, the information flows through a **Feed-Forward Network (FFN)**. While attention helps tokens communicate with each other, it does not perform complex feature transformations on the tokens themselves. That is where the FFN comes in.
+
+**What is the FFN?**
+The FFN is a small neural network applied **independently and identically** to each token. It consists of two linear layers with a non-linear activation function (like ReLU) in between.
+
+**The Formula:**
+$$FFN(x) = \max(0, xW_1 + b_1)W_2 + b_2$$
+
+**Why the FFN is Important:**
+1.  **Increases Model Capacity:** It allows the model to learn more complex patterns.
+2.  **Learns Non-linear Transformations:** The activation function ($\max(0, ...)$) adds the necessary non-linearity.
+3.  **Extracts Deeper Semantic Features:** It refines the representations built by the attention layers.
+
+---
+
+
 ### Transformers in Action
 
 Below is the complete PyTorch implementation of the Transformer architecture, covering everything from positional encoding to the final model.
@@ -301,21 +344,26 @@ import torch.nn.functional as F
 # ==============================================================================
 class PositionalEncoding(nn.Module):
     """
-    Adds positional information to token embeddings.
+    Adds positional information to token embeddings using sinusoidal functions.
     """
     def __init__(self, d_model, max_len=5000):
         super().__init__()
+        # Create a matrix of [max_len, d_model] to store positional encodings
         pe = torch.zeros(max_len, d_model)
         position = torch.arange(0, max_len, dtype=torch.float).unsqueeze(1)
+        
+        # Calculate the divisor term for the sinusoid frequencies
         div_term = torch.exp(torch.arange(0, d_model, 2).float() * (-math.log(10000.0) / d_model))
         
+        # Apply sine to even indices and cosine to odd indices
         pe[:, 0::2] = torch.sin(position * div_term)
         pe[:, 1::2] = torch.cos(position * div_term)
         
-        pe = pe.unsqueeze(0)
-        self.register_buffer('pe', pe)
+        pe = pe.unsqueeze(0) # Add batch dimension
+        self.register_buffer('pe', pe) # Register as a buffer (not a learnable parameter)
 
     def forward(self, x):
+        # Add positional encodings to the input embeddings
         seq_len = x.size(1)
         x = x + self.pe[:, :seq_len, :]
         return x
@@ -329,12 +377,17 @@ class ScaledDotProductAttention(nn.Module):
 
     def forward(self, Q, K, V, mask=None):
         d_k = Q.size(-1)
+        # Compute Dot Product similarity and scale by sqrt(d_k)
         scores = torch.matmul(Q, K.transpose(-2, -1)) / math.sqrt(d_k)
         
+        # Apply mask (e.g., for padding or look-ahead) by filling with -infinity
         if mask is not None:
             scores = scores.masked_fill(mask == 0, float('-inf'))
         
+        # Convert scores to probabilities (weights)
         attn = torch.softmax(scores, dim=-1)
+        
+        # Multiply weights by Value vectors
         output = torch.matmul(attn, V)
         return output, attn
 
@@ -344,7 +397,7 @@ class ScaledDotProductAttention(nn.Module):
 class MultiHeadAttention(nn.Module):
     def __init__(self, d_model, num_heads):
         super().__init__()
-        assert d_model % num_heads == 0
+        assert d_model % num_heads == 0 # Ensure d_model is divisible by heads
         
         self.d_model = d_model
         self.num_heads = num_heads
@@ -358,21 +411,27 @@ class MultiHeadAttention(nn.Module):
         self.attention = ScaledDotProductAttention()
 
     def split_heads(self, x):
+        # Reshape input to (batch_size, seq_len, num_heads, d_k)
         batch_size, seq_len, d_model = x.size()
         x = x.view(batch_size, seq_len, self.num_heads, self.d_k)
-        return x.transpose(1, 2)
+        return x.transpose(1, 2) # (batch_size, num_heads, seq_len, d_k)
 
     def combine_heads(self, x):
+        # Concatenate heads back to their original d_model dimension
         batch_size, num_heads, seq_len, d_k = x.size()
         x = x.transpose(1, 2).contiguous()
         return x.view(batch_size, seq_len, num_heads * d_k)
 
     def forward(self, query, key, value, mask=None):
+        # 1. Project through linear layers and split into multiple heads
         Q = self.split_heads(self.w_q(query))
         K = self.split_heads(self.w_k(key))
         V = self.split_heads(self.w_v(value))
         
+        # 2. Compute Scaled Dot-Product Attention for each head
         attn_output, attn_weights = self.attention(Q, K, V, mask)
+        
+        # 3. Combine heads and pass through final linear project
         combined = self.combine_heads(attn_output)
         output = self.w_o(combined)
         return output, attn_weights
@@ -388,10 +447,11 @@ class FeedForward(nn.Module):
         self.linear2 = nn.Linear(d_ff, d_model)
 
     def forward(self, x):
+        # Apply two linear layers with ReLU activation in between
         return self.linear2(self.dropout(F.relu(self.linear1(x))))
 
 # ==============================================================================
-# 5. Encoder Layer
+# 5. Encoder Layer (Self-Attention + FFN)
 # ==============================================================================
 class EncoderLayer(nn.Module):
     def __init__(self, d_model, num_heads, d_ff, dropout=0.1):
@@ -403,14 +463,17 @@ class EncoderLayer(nn.Module):
         self.dropout = nn.Dropout(dropout)
 
     def forward(self, x, src_mask=None):
+        # Sublayer 1: Multi-Head Self-Attention + Residual Connection + Norm
         attn_output, _ = self.self_attn(x, x, x, src_mask)
         x = self.norm1(x + self.dropout(attn_output))
+        
+        # Sublayer 2: Feed Forward Network + Residual Connection + Norm
         ffn_output = self.ffn(x)
         x = self.norm2(x + self.dropout(ffn_output))
         return x
 
 # ==============================================================================
-# 6. Decoder Layer
+# 6. Decoder Layer (Self-Attn + Cross-Attn + FFN)
 # ==============================================================================
 class DecoderLayer(nn.Module):
     def __init__(self, d_model, num_heads, d_ff, dropout=0.1):
@@ -424,10 +487,15 @@ class DecoderLayer(nn.Module):
         self.dropout = nn.Dropout(dropout)
 
     def forward(self, x, enc_output, tgt_mask=None, src_mask=None):
+        # Sublayer 1: Masked Self-Attention
         self_attn_output, _ = self.self_attn(x, x, x, tgt_mask)
         x = self.norm1(x + self.dropout(self_attn_output))
+        
+        # Sublayer 2: Cross-Attention (Query from Decoder, Key/Value from Encoder)
         cross_attn_output, _ = self.cross_attn(x, enc_output, enc_output, src_mask)
         x = self.norm2(x + self.dropout(cross_attn_output))
+        
+        # Sublayer 3: Feed Forward Network
         ffn_output = self.ffn(x)
         x = self.norm3(x + self.dropout(ffn_output))
         return x
@@ -445,6 +513,7 @@ class Encoder(nn.Module):
         self.d_model = d_model
 
     def forward(self, src, src_mask=None):
+        # Multiply by sqrt(d_model) as per original paper to scale embeddings
         x = self.embedding(src) * math.sqrt(self.d_model)
         x = self.pos_encoding(x)
         x = self.dropout(x)
@@ -484,14 +553,20 @@ class Transformer(nn.Module):
         self.pad_idx = pad_idx
 
     def make_src_mask(self, src):
+        # Mask out padding tokens (e.g., 0)
         src_mask = (src != self.pad_idx).unsqueeze(1).unsqueeze(2)
         return src_mask
 
     def make_tgt_mask(self, tgt):
+        # 1. Padding mask
         batch_size, tgt_len = tgt.shape
         tgt_padding_mask = (tgt != self.pad_idx).unsqueeze(1).unsqueeze(2)
+        
+        # 2. Look-ahead mask (Triangular mask to prevent seeing the future)
         look_ahead_mask = torch.tril(torch.ones((tgt_len, tgt_len), device=tgt.device)).bool()
         look_ahead_mask = look_ahead_mask.unsqueeze(0).unsqueeze(1)
+        
+        # Combine both masks
         tgt_mask = tgt_padding_mask & look_ahead_mask
         return tgt_mask
 
