@@ -578,3 +578,86 @@ class Transformer(nn.Module):
         logits = self.fc_out(dec_output)
         return logits
 ```
+
+---
+
+### Transformer Training Loop (Encoder-Decoder) - Detailed Guide
+{: .technical-heading }
+
+**1. Overview**
+The Transformer training loop involves preparing shifted targets, applying causal masking, running the encoder-decoder forward pass, computing cross-entropy loss, and updating weights via backpropagation.
+
+**2. Decoder Input and Target**
+To train the decoder, we use **Teacher Forcing**. We shift the target sentence to create inputs and outputs.
+*   **Target sentence:** `<start> I love AI <end>`
+*   **Decoder Input:** `<start> I love AI`
+*   **Target Output:** `I love AI <end>`
+
+**3. Target Mask (Causal Mask)**
+To prevent the model from looking into the future during training, we apply a causal mask.
+For a sequence length of 4 (`seq_len = 4`), the mask ensures that position $i$ can only see positions $\le i$.
+```text
+[[1, 0, 0, 0],
+ [1, 1, 0, 0],
+ [1, 1, 1, 0],
+ [1, 1, 1, 1]]
+```
+This mask ensures that each token can only attend to itself and previous tokens, not future ones. In our `Transformer` class implementation above, this is generated automatically by the `make_tgt_mask` function.
+
+**4. Forward Pass Dimensions**
+*   **Decoder Output:** `(batch, seq_len, d_model)`
+*   **After Linear Projection:** `(batch, seq_len, vocab_size)`
+*   **Example:** `(3, 4, 10000)` where 10000 is the vocabulary size.
+
+**5. Reshaping for Loss**
+PyTorch's Cross-Entropy Loss expects inputs in a specific shape. We flatten the batch and sequence dimensions:
+*   `output.view(-1, vocab_size)` $\to$ `(batch * seq_len, vocab_size)`
+*   `tgt_output.view(-1)` $\to$ `(batch * seq_len)`
+
+**Example:**
+*   `(3, 4, 10000)` $\to$ `(12, 10000)`
+*   `(3, 4)` $\to$ `(12)`
+
+**6. Cross Entropy Loss**
+For each token, the loss is calculated as:
+$$\text{loss} = -\log(\text{probability of correct word})$$
+The final loss is the average across all tokens in the batch.
+
+**7. Training Loop Code**
+Here is a simplified example of the training loop using our `Transformer` class:
+
+```python
+for epoch in range(num_epochs):
+    model.train()
+    total_loss = 0
+    
+    for src, tgt in dataloader:
+        optimizer.zero_grad()
+        
+        # Shift targets for input and output
+        # tgt_input: <start> I love AI
+        # tgt_output: I love AI <end>
+        tgt_input = tgt[:, :-1]
+        tgt_output = tgt[:, 1:]
+        
+        # Forward pass (mask is generated inside our Transformer model)
+        output = model(src, tgt_input)
+        
+        # Reshape for loss calculation
+        output = output.reshape(-1, vocab_size)
+        tgt_output = tgt_output.reshape(-1)
+        
+        # Compute loss and backpropagate
+        loss = criterion(output, tgt_output)
+        loss.backward()
+        optimizer.step()
+        
+        total_loss += loss.item()
+        
+    print(f"Epoch {epoch+1} Loss: {total_loss / len(dataloader)}")
+```
+
+**8. Key Insights**
+*   **Parallel Prediction:** The decoder predicts the next token at every position simultaneously during training.
+*   **Causal Mask:** Ensures no future information leakage (preserves autoregressive property).
+*   **Inference vs. Training:** Training is parallel (thanks to masking and teacher forcing), while inference is sequential (token-by-token).
