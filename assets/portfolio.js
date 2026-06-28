@@ -59,6 +59,9 @@
     var el = document.getElementById("typed");
     if (!el) return;
     var words = ["intelligent mobile apps", "deep learning models", "AI products", "things people love"];
+    if (el.dataset && el.dataset.words) {
+      try { words = JSON.parse(el.dataset.words); } catch (e) {}
+    }
     var w = 0, c = 0, deleting = false;
     function tick() {
       var word = words[w];
@@ -135,10 +138,9 @@
     }
 
     function size() {
-      var rect = canvas.parentElement.getBoundingClientRect();
-      w = canvas.width = rect.width;
-      h = canvas.height = rect.height;
-      var count = Math.min(90, Math.floor((w * h) / 14000));
+      w = canvas.width = window.innerWidth;
+      h = canvas.height = window.innerHeight;
+      var count = Math.min(110, Math.floor((w * h) / 16000));
       dots = [];
       for (var i = 0; i < count; i++) {
         dots.push({
@@ -208,12 +210,11 @@
       size();
       if (!prefersReduced) draw();
     });
-    canvas.parentElement.addEventListener("mousemove", function (e) {
-      var rect = canvas.getBoundingClientRect();
-      mouse.x = e.clientX - rect.left;
-      mouse.y = e.clientY - rect.top;
+    window.addEventListener("mousemove", function (e) {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
     });
-    canvas.parentElement.addEventListener("mouseleave", function () {
+    window.addEventListener("mouseleave", function () {
       mouse.x = mouse.y = null;
     });
   })();
