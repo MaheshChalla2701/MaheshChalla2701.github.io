@@ -174,7 +174,7 @@ body[data-theme="dark"] .timeline-text { color: #ccc; }
 
 <div class="profile-header">
     <div class="profile-image">
-        <img src="{{ '/assets/images/profile-photo.jpeg' | relative_url }}" alt="Mahesh Challa">
+        <img src="{{ '/assets/images/profile-photo.png' | relative_url }}" alt="Mahesh Challa">
     </div>
     <div class="profile-details">
         <h1>Mahesh Challa</h1>
