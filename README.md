@@ -1,4 +1,4 @@
-# Mahesh Challa's Personal Website & Portfolio
+﻿# Mahesh Challa's Personal Website & Portfolio
 
 Welcome to the repository for my personal website! 
 
@@ -18,5 +18,5 @@ Some of my featured projects include:
 - **Custom HTML & CSS**: To create an interactive profile timeline and modern layout.
 
 ## 📫 Connect with me
-- [LinkedIn](https://www.linkedin.com/in/mahesh-challa-54b60a283/)
+- [LinkedIn](https://www.linkedin.com/in/mahesh-challa/)
 - [GitHub](https://github.com/MaheshChalla2701)

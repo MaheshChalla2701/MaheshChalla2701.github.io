@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://maheshchalla2701.github.io/sitemap.xml

@@ -1,4 +1,4 @@
----
+﻿---
 layout: post
 title: "Understanding Transformers"
 date: 2026-03-06

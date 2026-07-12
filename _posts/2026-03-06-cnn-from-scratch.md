@@ -1,4 +1,4 @@
----
+﻿---
 layout: post
 title: "Building a CNN from Scratch"
 date: 2026-03-06
